@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <svg></svg>
+    <div id="controls"></div>
+</body>
+<script src="../../d3.v7.min.js"></script>
+<script src="/colorbrewer.v1.min.js"></script>
+<script src="/soccerviz.js"></script>
+<style>
+svg {
+    width: 90%;
+}
+#controls {
+    display: flex;
+    gap: 0.5rem;
+}
+button {
+    cursor: pointer;
+}
+text {
+    font-size: 10px;
+    text-anchor: middle;
+    fill: #4f442b;
+}
+g > text.active {
+    font-size: 30px;
+}
+circle {
+    fill: #75739F;
+    stroke: black;
+    stroke-width: 1px;
+}
+circle.active {
+    fill: #FE9922;
+}
+circle.inactive {
+    fill: #C4B9AC;
+}
+</style>
+</html>
