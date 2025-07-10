@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+    <script src="/d3.v7.min.js"></script>
+    <script src="/ch3/index.js"></script>
+    <style>
+        svg {
+            background-color: whitesmoke;
+            width: 60vw;
+            height: 60vw;
+        }
+        button {
+            cursor: pointer;
+        }
+        text {
+            font-size: 10px;
+            text-anchor: middle;
+            fill: #4f442b;
+        }
+        g > text.active {
+            font-size: 30px;
+        }
+        circle {
+            fill: #75739F;
+            stroke: black;
+            stroke-width: 1px;
+        }
+        circle.active {
+            fill: #FE9922;
+        }
+        circle.inactive {
+            fill: #C4B9AC;
+        }
+    </style>
+</body>
+</html>
