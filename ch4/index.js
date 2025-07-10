@@ -15,24 +15,19 @@ function addBoxPlot(data, yScale, xScale){
     d3.select("svg")
         .append("g")
         .attr("id", "chartArea")
-        .selectAll("g#box")
+        .selectAll("g#boxPlot")
         .data(data)
         .enter()
         .append('g')
-        .attr("id", "box")
+        .attr("id", "boxPlot")
 
 
     d3.select("g#chartArea")
-        .selectAll("g#box")
+        .selectAll("g#boxPlot")
         .each(function(d, i){
-            const median = d.median
-            const min = d.min
-            const max = d.max
-            const q1 = d.q1
-            const q3 = d.q3
-
             d3.select(this)
                 .append("line")
+                .attr("class", "range")
                 .attr("x1", xScale(d.day))
                 .attr("y1", yScale(d.min))
                 .attr("x2", xScale(d.day))
@@ -40,9 +35,9 @@ function addBoxPlot(data, yScale, xScale){
                 .style("stroke", "darkgray")
                 .style("stroke-width", "4px")
 
-                // console.log({day: d.day, min, max, q1, q3, iq: parseInt(q3) - parseInt(q1), height: yScale(parseInt(q1) - parseInt(q3))})
             d3.select(this)
                 .append("rect")
+                .attr("class", "box")
                 .attr("x", xScale(d.day) - 10)
                 .attr("y", yScale(d.q3))
                 .attr("width", 20)
@@ -50,6 +45,33 @@ function addBoxPlot(data, yScale, xScale){
                 .attr("fill", 'white')
                 .attr("stroke", "black")
                 .attr("stroke-width", '1px')
+
+            d3.select(this)
+                .append("line")
+                .attr("x1", xScale(d.day) - 10)
+                .attr("y1", yScale(d.max))
+                .attr("x2",  xScale(d.day) + 10)
+                .attr("y2", yScale(d.max))
+                .attr("stroke", "darkgray")
+                .attr("stroke-width", '4px')
+
+            d3.select(this)
+                .append("line")
+                .attr("x1", xScale(d.day) - 10)
+                .attr("y1", yScale(d.min))
+                .attr("x2",  xScale(d.day) + 10)
+                .attr("y2", yScale(d.min))
+                .attr("stroke", "darkgray")
+                .attr("stroke-width", '4px')
+
+            d3.select(this)
+                .append("line")
+                .attr("x1", xScale(d.day) - 10)
+                .attr("y1", yScale(d.median))
+                .attr("x2",  xScale(d.day) + 10)
+                .attr("y2", yScale(d.median))
+                .attr("stroke", "darkgray")
+                .attr("stroke-width", '4px')
         })
 }
 
