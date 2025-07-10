@@ -1,15 +1,33 @@
-d3.csv('data.csv').then(data => {
-    const yExtent = d3.extent(data, d => d.median)
-    const xExtent = d3.extent(data, d => d.day)
 
-    const yScale = d3.scaleLinear().domain([0, yExtent[1] * 2]).range([450, 50])
-    const xScale = d3.scaleLinear().domain([0, parseInt(xExtent[1]) + 1]).range([50, 450])
-
-    addAxes(yScale, xScale)    
-    // addScatter(data, yScale, xScale)
-    addBoxPlot(data, yScale, xScale)
+function boxPlot(){
+    d3.csv('data.csv').then(data => {
+        const yExtent = d3.extent(data, d => d.median)
+        const xExtent = d3.extent(data, d => d.day)
     
-})
+        const yScale = d3.scaleLinear().domain([0, yExtent[1] * 2.5]).range([450, 50])
+        const xScale = d3.scaleLinear().domain([0, parseInt(xExtent[1]) + 1]).range([50, 450])
+    
+        addAxes(yScale, xScale)    
+        addBoxPlot(data, yScale, xScale)
+    })  
+}
+
+function scatterPlot(){
+    d3.csv('data.csv').then(data => {
+        const yExtent = d3.extent(data, d => d.median)
+        const xExtent = d3.extent(data, d => d.day)
+    
+        const yScale = d3.scaleLinear().domain([0, yExtent[1] * 2]).range([450, 50])
+        const xScale = d3.scaleLinear().domain([0, parseInt(xExtent[1]) + 1]).range([50, 450])
+    
+        addAxes(yScale, xScale)    
+        addScatter(data, yScale, xScale)
+    })
+}
+
+function lineChart(){
+
+}
 
 function addBoxPlot(data, yScale, xScale){
     d3.select("svg")
@@ -91,7 +109,7 @@ function addScatter(data, yScale, xScale){
 function addAxes(yScale, xScale){
    
     const xAxis = d3.axisBottom().scale(xScale).tickSize(400).ticks(7)
-    const yAxis = d3.axisRight().scale(yScale).tickSize(400).ticks(5)
+    const yAxis = d3.axisRight().scale(yScale).tickSize(400).ticks(10)
 
     d3.select("svg")
         .append("g")
@@ -126,6 +144,6 @@ function addAxes(yScale, xScale){
              const line = this.querySelector("line")
              line.style.opacity = 0.3
           })
-
-
 }
+
+boxPlot()
