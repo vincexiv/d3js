@@ -26,7 +26,99 @@ function scatterPlot(){
 }
 
 function lineChart(){
+    d3.csv("tweets.csv").then(data => {
+        const dayExtent = d3.extent(data, d => parseInt(d.day))
+        const tweetExtent = d3.extent(data, d => parseInt(d.tweets))
+        const retweetExtent = d3.extent(data, d => parseInt(d.retweets))
+        const favoriteExtent = d3.extent(data, d => parseInt(d.favorites))
 
+        const max = Math.max(tweetExtent[1], retweetExtent[1], favoriteExtent[1])
+        console.log({favoriteExtent})
+
+        const yScale = d3.scaleLinear().domain([0, parseInt(max) * 1.2]).range([450, 50])
+        const xScale = d3.scaleLinear().domain([0, parseInt(dayExtent[1]) + 1]).range([50, 450])
+
+        addAxes(yScale, xScale, 10, 10)
+        addTweetPoints(data, yScale, xScale)
+        addLines(data, yScale, xScale)
+
+    })
+}
+
+function addLines(data, yScale, xScale){
+    const tweetLine = d3.line()
+        .y(d => yScale(d.tweets))
+        .x(d => xScale(d.day))
+
+    const favoritesLine = d3.line()
+        .y(d => yScale(d.favorites))
+        .x(d => xScale(d.day))
+
+    const retweetLine = d3.line()
+        .y(d => yScale(d.retweets))
+        .x(d => xScale(d.day))
+
+    d3.select("svg")
+        .append("path")
+        .attr("d", tweetLine(data))
+        .attr("fill", "none")
+        .attr("stroke", "blue")
+        .attr("stroke-width", "2")
+
+    d3.select("svg")
+        .append("path")
+        .attr("d", favoritesLine(data))
+        .attr("fill", "none")
+        .attr("stroke", "green")
+        .attr("stroke-width", "2")
+
+    d3.select("svg")
+        .append("path")
+        .attr("d", retweetLine(data))
+        .attr("fill", "none")
+        .attr("stroke", "yellow")
+        .attr("stroke-width", "2")
+}
+
+function addTweetPoints(data, yScale, xScale){
+    d3.select("svg")
+        .append("g")
+        .selectAll("g.tweet")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("class", "tweet")
+        .attr("cx", d => xScale(d.day))
+        .attr("cy", d => yScale(d.tweets))
+        .attr("r", 5)
+        .style("fill", 'blue')
+        .style("stroke", "none")
+
+    d3.select("svg")
+        .append("g")
+        .selectAll("g.tweet")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("class", "tweet")
+        .attr("cx", d => xScale(d.day))
+        .attr("cy", d => yScale(d.favorites))
+        .attr("r", 5)
+        .style("fill", 'green')
+        .style("stroke", "none")
+
+    d3.select("svg")
+        .append("g")
+        .selectAll("g.tweet")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("class", "tweet")
+        .attr("cx", d => xScale(d.day))
+        .attr("cy", d => yScale(d.retweets))
+        .attr("r", 5)
+        .style("fill", 'yellow')
+        .style("stroke", "none")
 }
 
 function addBoxPlot(data, yScale, xScale){
@@ -106,10 +198,10 @@ function addScatter(data, yScale, xScale){
         .attr("r", 5)
 }
 
-function addAxes(yScale, xScale){
+function addAxes(yScale, xScale, yTicks = 10, xTicks = 7){
    
-    const xAxis = d3.axisBottom().scale(xScale).tickSize(400).ticks(7)
-    const yAxis = d3.axisRight().scale(yScale).tickSize(400).ticks(10)
+    const xAxis = d3.axisBottom().scale(xScale).tickSize(400).ticks(xTicks)
+    const yAxis = d3.axisRight().scale(yScale).tickSize(400).ticks(yTicks)
 
     d3.select("svg")
         .append("g")
@@ -144,6 +236,10 @@ function addAxes(yScale, xScale){
              const line = this.querySelector("line")
              line.style.opacity = 0.3
           })
+
+    d3.select("svg")
+        .selectAll("path.domain")
+        .style("display", "none")
 }
 
-boxPlot()
+lineChart()
