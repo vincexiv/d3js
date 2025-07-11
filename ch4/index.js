@@ -45,6 +45,66 @@ function lineChart(){
     })
 }
 
+function stackedAreaChart(){
+    d3.csv("movies.csv").then(data => {
+        let max = 0;
+        const stackedData = []
+        data.forEach(item => {
+            let total = 0
+            const stackedItem = {}
+            Object.keys(item).forEach(key => {
+                if(key !== 'day'){
+                    total += parseInt(item[key])
+                    stackedItem[key] = total
+                } else {
+                    stackedItem[key] = item[key]
+                }
+            })
+
+            stackedData.push(stackedItem)
+            if(total > max){
+                max = total
+            }
+        })
+
+        const xExtent = d3.extent(stackedData, d => d.day)
+        const xScale = d3.scaleLinear().domain([1, parseInt(xExtent[1]) + 1]).range([50, 450])
+        const yExtent = [0, max]
+        const yScale = d3.scaleLinear().domain([0, parseInt(yExtent[1]) * 1.5]).range([450, 50])
+
+        addAxes(yScale, xScale, 10, 10)
+
+        const fillScale = d3.scaleOrdinal()
+            .domain(["titanic", "avatar", "akira", "frozen", "deliverance", "avengers"])
+            .range(["#fcd88a", "#cf7c1c", "#93c464", "#75734F", "#5eafc6", "#41a368"])
+        
+        let previousKey
+        Object.keys(stackedData[0]).forEach((key, index) => {
+            if(key !== 'day'){
+                const yLine = d3.area()
+                    .x(d => xScale(d.day))
+                    .y0(d => previousKey === 'day' ? yScale(0): yScale(d[previousKey] || 0) )
+                    .y1(d => yScale(d[key]))
+                    .curve(d3.curveMonotoneX)
+                    
+                    addLine(stackedData, yLine, fillScale(key))
+            }
+            previousKey = key
+        })
+
+        console.log(yScale(undefined))
+    })
+}
+
+function addLine(data, line, color){
+    d3.select("svg")
+        .append("path")
+        .attr("d", line(data))
+        .attr("fill", color)
+        .attr("stroke", 'darkgrey')
+        .attr("stroke-width", "1")
+}
+
 function addLines(data, yScale, xScale){
     const tweetLine = d3.line()
         .y(d => yScale(d.tweets))
@@ -242,4 +302,4 @@ function addAxes(yScale, xScale, yTicks = 10, xTicks = 7){
         .style("display", "none")
 }
 
-lineChart()
+stackedAreaChart()
