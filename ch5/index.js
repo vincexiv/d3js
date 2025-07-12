@@ -41,6 +41,60 @@ function violin(){
         .attr("fill", (d, i) => fillScale(i))
 }
 
+function pieChart(){
+    const pie = d3.pie().value(d => d.value)
+    const data = [{ value: 1, id: 1},{value: 2, id: 2},{value: 3, id: 3}]
+    const pieData = pie(data)
+
+    const fillScale = d3.scaleOrdinal()
+        .range(["#fcd88a", "#cf7c1c", "#93c464", "#75734F"])
+
+    const arc = d3.arc()
+    arc.innerRadius(50)
+    arc.outerRadius(100)
+
+    d3.select("svg")
+        .append("g")
+        .attr("id", 'pieChart')
+        .attr("transform", "translate(250, 250)")
+        .selectAll("path.pieArc")
+        .data(pieData)
+        .enter()
+        .append("path")
+        .attr("class", "pieArc")
+        .attr("d", d => arc(d))
+        .attr("fill", (d, i) => fillScale(i))
+        .attr("stroke", d => "black")
+        .transition().duration(1000)
+
+    d3.select("g#pieChart").on("click", function(){
+        const newPieData = pie([ {value: 6, id: 4}, { value: 7, id: 5}])
+        console.log("clicked", newPieData, this)
+        const paths = d3.select(this)
+            .selectAll("path.pieArc")
+            .data(newPieData, d => d.id)
+
+            paths.exit().remove()
+
+            paths.enter()
+            .append("path")
+            .attr("class", "pieArc")
+            .attr("fill", (d, i) => fillScale(i))
+            .attr("stroke", "black")
+            .attr("d", arc)
+            .each(function(d) { this._current = d; console.log(this._current) }) // store the initial state
+            .merge(paths)
+            .transition()
+            .duration(30000)
+            .attrTween("d", function(d) {
+              const interpolate = d3.interpolate(this._current, d);
+              this._current = interpolate(1);
+              return t => arc(interpolate(t));
+            });
+    })
+
+}
+
 function draw(data, key){
     const xExtent = [0, d3.max(data, d => parseInt(d[key]))]
     const { bins, binSize } = getThresholds(xExtent, 5)
@@ -160,4 +214,4 @@ function addAxes(yScale, xScale, yTicks = 10, xTicks = 7){
 }
 
 
-violin()
+pieChart()
