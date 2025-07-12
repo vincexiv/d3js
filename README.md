@@ -1,1 +1,1 @@
-This repo probably doesn't matter. It's just me playing around with D3JS
+Just me playing around with D3JS. Nothing important
