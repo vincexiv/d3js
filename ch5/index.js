@@ -6,6 +6,41 @@ function histogram(){
     })
 }
 
+function violin(){
+    var fillScale = d3.scaleOrdinal().range(["#fcd88a", "#cf7c1c", "#93c464"])
+    const xScale = d3.scaleLinear().domain([0, 10]).range([0, 10])
+    const yScale = d3.scaleLinear().domain([-3, 3]).range([450, 50])
+    addYAxis(yScale, 10)
+
+    var normal = d3.randomNormal()
+    var sampleData1 = d3.range(100).map(d => normal())
+    var sampleData2 = d3.range(100).map(d => normal())
+    var sampleData3 = d3.range(100).map(d => normal())
+
+    const histoChart = d3.histogram()
+        .domain([ -3, 3 ])
+        .thresholds([ -3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3 ])
+        .value(d => d)
+
+    const area = d3.area()
+        .y(d => yScale(d.x0))
+        .x0(d => xScale(-1 * d.length))
+        .x1(d => xScale(d.length))
+        .curve(d3.curveCatmullRom)
+
+    d3.select("svg")
+        .append("g")
+        .selectAll("g.violin")
+        .data([sampleData1, sampleData2, sampleData3])
+        .enter()
+        .append("g")
+        .append("path")
+        .attr("class", "violin")
+        .attr("transform", (d, i) => `translate(${100 + (i * 100)}, 0)`)
+        .attr("d", d => area(histoChart(d)))
+        .attr("fill", (d, i) => fillScale(i))
+}
+
 function draw(data, key){
     const xExtent = [0, d3.max(data, d => parseInt(d[key]))]
     const { bins, binSize } = getThresholds(xExtent, 5)
@@ -57,6 +92,29 @@ function getThresholds(extent, noOfBins){
     return { bins, binSize }
 }
 
+function addYAxis(yScale, yTicks){
+    const yAxis = d3.axisRight().scale(yScale).tickSize(400).ticks(yTicks)
+    
+    d3.select("svg")
+        .append("g")
+        .attr("id", "yAxisG")
+        .call(yAxis)
+        .attr("transform", "translate(50, 0)")
+
+    d3.select("g#yAxisG")
+        .selectAll("line")
+        .attr("stroke", "darkgrey")
+        .attr("stroke-width", "1")
+
+    d3.select("g#yAxisG")
+        .selectAll("text")
+        .attr("transform", "translate(15, 0)")
+
+    d3.select("svg")
+        .selectAll("path.domain")
+        .style("display", "none")
+}
+
 function addAxes(yScale, xScale, yTicks = 10, xTicks = 7){
    
     const xAxis = d3.axisBottom().scale(xScale).tickSize(400).ticks(xTicks)
@@ -102,4 +160,4 @@ function addAxes(yScale, xScale, yTicks = 10, xTicks = 7){
 }
 
 
-histogram()
+violin()
