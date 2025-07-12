@@ -100,7 +100,6 @@ function stackedChart(){
         const yExtent = [0, maxY]
         const xExtent = [0, maxX]
 
-        console.log({yExtent})
 
         const movies = Object.keys(data[0]).filter(d => d != 'day')
 

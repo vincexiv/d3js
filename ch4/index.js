@@ -33,7 +33,6 @@ function lineChart(){
         const favoriteExtent = d3.extent(data, d => parseInt(d.favorites))
 
         const max = Math.max(tweetExtent[1], retweetExtent[1], favoriteExtent[1])
-        console.log({favoriteExtent})
 
         const yScale = d3.scaleLinear().domain([0, parseInt(max) * 1.2]).range([450, 50])
         const xScale = d3.scaleLinear().domain([0, parseInt(dayExtent[1]) + 1]).range([50, 450])

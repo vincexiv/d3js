@@ -1,1 +1,1 @@
-Just me playing around with D3JS. Nothing important
+Just me playing around with D3JS. Nothing much

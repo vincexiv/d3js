@@ -49,7 +49,6 @@ function highlightRegion(e, data, context){
 }
 
 function highlightText(e, data){
-    console.log({data})
     d3.selectAll("text")
         .attr("class", d => data.team === d.team ? 'active' : 'inactive')
         .transition()
@@ -57,8 +56,6 @@ function highlightText(e, data){
         .attr("y", d => data.team === d.team ? -40 : 40)
 
     const text = d3.select("text.active").node()
-    console.log({text})
-    console.log(text.parentElement.parentElement)
     text.parentElement.parentElement.append(text.parentElement)
 }
 
