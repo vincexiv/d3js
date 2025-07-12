@@ -96,8 +96,11 @@ function pieChart(){
 function stackedChart(){
     d3.csv("movies.csv").then(data => {
         const maxY = d3.max(data, d => d3.sum(Object.values(d), a => parseInt(a)))
-        const yExtent = [-maxY, maxY]
-        const xExtent = [1, d3.max(data.map(d => d.day), d => parseInt(d))]
+        const maxX = d3.max(data.map(d => d.day), d => parseInt(d)) + 1
+        const yExtent = [0, maxY]
+        const xExtent = [0, maxX]
+
+        console.log({yExtent})
 
         const movies = Object.keys(data[0]).filter(d => d != 'day')
 
@@ -108,26 +111,38 @@ function stackedChart(){
         const yScale = d3.scaleLinear().domain(yExtent).range([450, 50])
         const xScale = d3.scaleLinear().domain(xExtent).range([50, 450])
 
-        addAxes(yScale, xScale)
+        addAxes(yScale, xScale, 10, 10)
 
         const stackArea = d3.area()
             .y0(d => yScale(d[0]))
             .y1(d => yScale(d[1]))
             .x(d => xScale(parseInt(d.data.day)))
-            .curve(d3.curveBasis)
 
         const stack = d3.stack()
             .keys(movies)
-            .offset(d3.stackOffsetSilhouette).order(d3.stackOrderInsideOut)
 
         d3.select("svg")
             .selectAll("path.area")
             .data(stack(data))
             .enter()
-            .append("path")
-            .attr("class", "area")
-            .attr("d", d => stackArea(d))
-            .attr("fill", d => fillScale(d.key))
+            .append("g")
+            .attr("class", "stack")
+            .each(function(stack, i){
+                d3.select(this)
+                    .selectAll("rect")
+                    .data(stack)
+                    .enter()
+                    .append("rect")
+                    .attr("x", (d, i) => xScale(d.data.day) - 15)
+                    .attr("y", d => yScale(d[1]))
+                    .attr("width", d => 30)
+                    .attr("height", d => {
+                        return yScale(d[0]) - yScale(d[1])
+                    })
+                    .attr("fill", (d, i)=> {
+                        return fillScale(stack.key)
+                    })
+            })
             
     })
 }
