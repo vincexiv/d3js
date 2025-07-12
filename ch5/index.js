@@ -69,7 +69,6 @@ function pieChart(){
 
     d3.select("g#pieChart").on("click", function(){
         const newPieData = pie([ {value: 6, id: 4}, { value: 7, id: 5}])
-        console.log("clicked", newPieData, this)
         const paths = d3.select(this)
             .selectAll("path.pieArc")
             .data(newPieData, d => d.id)
@@ -82,7 +81,7 @@ function pieChart(){
             .attr("fill", (d, i) => fillScale(i))
             .attr("stroke", "black")
             .attr("d", arc)
-            .each(function(d) { this._current = d; console.log(this._current) }) // store the initial state
+            .each(function(d) { this._current = d }) // store the initial state
             .merge(paths)
             .transition()
             .duration(30000)
@@ -92,7 +91,43 @@ function pieChart(){
               return t => arc(interpolate(t));
             });
     })
+}
 
+function stackedChart(){
+    d3.csv("movies.csv").then(data => {
+        const yExtent = [0, d3.max(data, d => d3.sum(Object.values(d), a => parseInt(a)))]
+        const xExtent = [1, d3.max(data.map(d => d.day), d => parseInt(d))]
+
+        const movies = Object.keys(data[0]).filter(d => d != 'day')
+
+        const fillScale = d3.scaleOrdinal()
+            .domain(movies)
+            .range(["#fcd88a", "#cf7c1c", "#93c464", "#75734F", "#5eafc6", "#41a368"])
+
+        const yScale = d3.scaleLinear().domain(yExtent).range([450, 50])
+        const xScale = d3.scaleLinear().domain(xExtent).range([50, 450])
+
+        addAxes(yScale, xScale)
+
+        const stackArea = d3.area()
+            .y0(d => yScale(d[0]))
+            .y1(d => yScale(d[1]))
+            .x(d => xScale(parseInt(d.data.day)))
+
+        const stack = d3.stack()
+            .keys(movies)
+
+        d3.select("svg")
+            .selectAll("path.area")
+            .data(stack(data))
+            .enter()
+            .append("path")
+            .attr("class", "area")
+            .attr("d", (d, i) => {
+                return stackArea(d)
+            })
+            .attr("fill", d => fillScale(d.key))
+    })
 }
 
 function draw(data, key){
@@ -115,7 +150,7 @@ function draw(data, key){
         .append("rect")
         .attr("x", (d, i ) => xScale(d.x0))
         .attr("y", d => yScale(d.length))
-        .attr("width", d => { console.log(d.x0, d.x1, xScale(d.x1 - d.x0), xScale(1)); return xScale(1) - 2})
+        .attr("width", d => xScale(1) - 2)
         .attr("height", d => 450 - yScale(d.length))
         .style("stroke", "darkgrey")
 }
@@ -214,4 +249,4 @@ function addAxes(yScale, xScale, yTicks = 10, xTicks = 7){
 }
 
 
-pieChart()
+stackedChart()
