@@ -91,8 +91,6 @@ function stackedAreaChart(){
             }
             previousKey = key
         })
-
-        console.log(yScale(undefined))
     })
 }
 
