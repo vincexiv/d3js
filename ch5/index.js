@@ -95,7 +95,8 @@ function pieChart(){
 
 function stackedChart(){
     d3.csv("movies.csv").then(data => {
-        const yExtent = [0, d3.max(data, d => d3.sum(Object.values(d), a => parseInt(a)))]
+        const maxY = d3.max(data, d => d3.sum(Object.values(d), a => parseInt(a)))
+        const yExtent = [-maxY, maxY]
         const xExtent = [1, d3.max(data.map(d => d.day), d => parseInt(d))]
 
         const movies = Object.keys(data[0]).filter(d => d != 'day')
@@ -113,9 +114,11 @@ function stackedChart(){
             .y0(d => yScale(d[0]))
             .y1(d => yScale(d[1]))
             .x(d => xScale(parseInt(d.data.day)))
+            .curve(d3.curveBasis)
 
         const stack = d3.stack()
             .keys(movies)
+            .offset(d3.stackOffsetSilhouette).order(d3.stackOrderInsideOut)
 
         d3.select("svg")
             .selectAll("path.area")
@@ -123,10 +126,9 @@ function stackedChart(){
             .enter()
             .append("path")
             .attr("class", "area")
-            .attr("d", (d, i) => {
-                return stackArea(d)
-            })
+            .attr("d", d => stackArea(d))
             .attr("fill", d => fillScale(d.key))
+            
     })
 }
 
