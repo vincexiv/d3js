@@ -32,10 +32,10 @@ function dendogram(data){
         .enter()
         .append("line")
         .attr("class", "link")
-        .attr("y1", d => d.y)    
-        .attr("x1", d => d.x)
-        .attr("x2", d => d.parent.x)
-        .attr("y2", d => d.parent.y)
+        .attr("y1", d => d.x)    
+        .attr("x1", d => d.y)
+        .attr("x2", d => d.parent.y)
+        .attr("y2", d => d.parent.x)
         .attr("transform", "translate(50, 50)")
         .style("stroke", "black")
 
@@ -47,7 +47,7 @@ function dendogram(data){
         .enter()
         .append("g")
         .attr("class", "node")
-        .attr("transform", d => `translate(${d.x}, ${d.y})`)
+        .attr("transform", d => `translate(${d.y}, ${d.x})`)
 
     d3.selectAll("g.node")
         .append("circle")
