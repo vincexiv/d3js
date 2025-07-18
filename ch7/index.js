@@ -5,37 +5,113 @@ const edgeList = new Promise((resolve, reject) => {
     d3.csv("edgelist.csv").then(d => resolve(d)).catch(e => reject(e))
 })
 
-const data = Promise.all([nodeList, edgeList]).then(resolve => {
-    const nodes = resolve[0]
-    const edges = resolve[1]
-
-    const edgeHash = {}
-    edges.forEach((edge) => {
-        const id = `${edge.source}-${edge.target}`
-        edgeHash[id] = edge
-    })
-
-    const matrix = []
-
-    nodes.forEach((source, a) => {
-        nodes.forEach((target, b) => {
-            const grid = {
-                id: `${source.id}-${target.id}`,
-                y: a,
-                x: b,
-                weight: 0
-            }
-
-            if(edgeHash[grid.id]){
-                grid.weight = edgeHash[grid.id].weight
-            }
-
-            matrix.push(grid)
+function adjacencyMatrix(){
+    Promise.all([nodeList, edgeList]).then(resolve => {
+        const nodes = resolve[0]
+        const edges = resolve[1]
+    
+        const edgeHash = {}
+        edges.forEach((edge) => {
+            const id = `${edge.source}-${edge.target}`
+            edgeHash[id] = edge
         })
+    
+        const matrix = []
+    
+        nodes.forEach((source, a) => {
+            nodes.forEach((target, b) => {
+                const grid = {
+                    id: `${source.id}-${target.id}`,
+                    y: a,
+                    x: b,
+                    weight: 0
+                }
+    
+                if(edgeHash[grid.id]){
+                    grid.weight = edgeHash[grid.id].weight
+                }
+    
+                matrix.push(grid)
+            })
+        })
+    
+        createAdjacencyMatrix(matrix, nodes)
     })
+}
 
-    createAdjacencyMatrix(matrix, nodes)
-})
+function arcDiagram(){
+    Promise.all([nodeList, edgeList]).then(resolve => {
+        const nodes = resolve[0]
+        const edges = resolve[1]
+            
+        const edgeHash = {}
+        edges.forEach(edge => {
+            edgeHash[`${edge.source}-${edge.target}`] = edge
+        })
+        
+        const connections = []
+        nodes.forEach((source, a) => {
+            nodes.forEach((target, b) => {    
+                if(edgeHash[`${source.id}-${target.id}`] && target.id !== source.id){
+                    const item = {
+                        source: source,
+                        target: target,
+                        source_pos: a,
+                        target_pos: b,
+                        weight: edgeHash[`${source.id}-${target.id}`].weight
+                    }
+                    connections.push(item)
+                }
+            })
+        })
+
+        createArcDiagram(connections, nodes)
+    })  
+}
+
+function createArcDiagram(connections, nodes){
+    d3.select("svg")
+        .append("g")
+        .attr("transform", "translate(50, 250)")
+        .attr("id", "nodes")
+        .selectAll("circle.node")
+        .data(nodes)
+        .enter()
+        .append("g")
+        .attr("class", "nodeG")
+        .attr("transform", (d, i) => `translate(${i * 25}, 0)`)
+        .append("circle")
+        .attr("class", "node")
+        .attr("r", 5)
+
+    d3.select("svg")
+        .selectAll("g.nodeG")
+        .append("text")
+        .text(d => d.id)
+        .attr("transform", "translate(0, 15)")
+
+    d3.select("svg")
+        .append("g")
+        .attr("transform", "translate(50, 250)")
+        .selectAll("path.edge")
+        .data(connections)
+        .enter()
+        .append("path")
+        .attr("d", arc)
+        .style("stroke-width", d => d.weight * 2)
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("opacity", 0.25)
+}
+
+function arc(d, i){
+    const draw = d3.line().curve(d3.curveBasis)
+    const middleX = (d.target_pos + d.source_pos) / 2
+    const middleY = (d.target_pos - d.source_pos) * 25
+    const path = draw([[d.source_pos * 25, 0], [middleX * 25, middleY], [d.target_pos * 25, 0]])
+    return path
+}
+
 
 function createAdjacencyMatrix(matrix, nodes){
     d3.select("svg")
@@ -82,3 +158,5 @@ function createAdjacencyMatrix(matrix, nodes){
         .style("text-anchor", "end")
         .attr("y", (d,i) => i * 25 + 12.5)
 }
+
+arcDiagram()
