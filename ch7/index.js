@@ -176,7 +176,23 @@ function forceDirectedNetworkDiagram(){
 
         d3.select("#controls").append("button")
         .on("click", () => sizeByDegree(simulation)).html("Degree Size")
+
+        const drag = d3.drag()
+            .on("drag", (e, d) => dragging(e, d, simulation))
+
+        d3.select("svg")
+            .selectAll("g.node")
+            .call(drag)
     })
+}
+
+function dragging(e, d, simulation){
+    d.fx = e.x
+    d.fy = e.y
+    if (simulation.alpha() < 0.1) {
+        simulation.alpha(0.1)
+        simulation.restart()
+    }
 }
 
 function sizeByDegree(simulation) {
@@ -194,7 +210,6 @@ function forceTick(){
         .attr("x2", d => d.target.x)
         .attr("y2", d => d.target.y)
         .style("stroke", "black")
-        .each(d => console.log(d))
 
     d3.selectAll("g.node")
         .attr("transform", d => `translate(${d.x},${d.y})`)
