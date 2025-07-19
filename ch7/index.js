@@ -69,6 +69,34 @@ function arcDiagram(){
     })  
 }
 
+function forceDirectedLayout(){
+    const roleScale = d3.scaleOrdinal().range(["#75739F", "#41A368", "#FE9922"])
+    const sampleData = d3.range(100).map((d,i) => ({r: 20 - i * .5}))
+
+    const manyBody = d3.forceManyBody().strength(1)
+    const center = d3.forceCenter().x(250).y(250)
+    const force = d3.forceSimulation()
+
+    d3.select("svg")
+        .append("g")
+        .attr("id", "circlesG")
+        .selectAll("circle.node")
+        .data(sampleData)
+        .enter()
+        .append("circle")
+        .attr("class", "node")
+        .attr("r", d => d.r)
+        .style("fill", (d, i) => roleScale(i))
+        .style("stroke", "none")
+
+    force
+        .force("charge", manyBody)
+        .force("center", center)
+        .force("collision", d3.forceCollide(d => d.r))
+        .nodes(sampleData)
+        .on("tick", updateNetwork)
+}
+
 function createArcDiagram(connections, nodes){
     d3.select("svg")
         .append("g")
@@ -102,6 +130,13 @@ function createArcDiagram(connections, nodes){
         .style("fill", "none")
         .style("stroke", "black")
         .style("opacity", 0.25)
+}
+
+function updateNetwork(d, i){
+    d3.select("svg")
+        .selectAll("circle.node")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
 }
 
 function arc(d, i){
@@ -159,4 +194,4 @@ function createAdjacencyMatrix(matrix, nodes){
         .attr("y", (d,i) => i * 25 + 12.5)
 }
 
-arcDiagram()
+forceDirectedLayout()
