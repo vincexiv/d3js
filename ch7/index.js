@@ -115,6 +115,11 @@ function forceDirectedNetworkDiagram(){
                 edge.target = nodeHash[edge.target]
             })
 
+        nodes.forEach(d => {
+                d.degreeCentrality = edges.filter(
+                p => p.source === d || p.target === d).length
+            })
+
         d3.select("svg")
             .append("g")
             .attr("class", "links")
@@ -168,7 +173,18 @@ function forceDirectedNetworkDiagram(){
             d3.selectAll("line").attr("marker-end", "url(#triangle)");
 
         d3.selectAll("line").attr("marker-end", "url(#triangle)");
+
+        d3.select("#controls").append("button")
+        .on("click", () => sizeByDegree(simulation)).html("Degree Size")
     })
+}
+
+function sizeByDegree(simulation) {
+    simulation.stop()
+    simulation.force("charge", d3.forceManyBody().strength(d => -d.degreeCentrality * 30))
+    simulation.restart()
+    d3.selectAll("circle")
+    .attr("r", d => d.degreeCentrality * 2)
 }
 
 function forceTick(){
