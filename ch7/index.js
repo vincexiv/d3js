@@ -175,7 +175,10 @@ function forceDirectedNetworkDiagram(){
         d3.selectAll("line").attr("marker-end", "url(#triangle)");
 
         d3.select("#controls").append("button")
-        .on("click", () => sizeByDegree(simulation)).html("Degree Size")
+            .on("click", () => sizeByDegree(simulation)).html("Degree Size")
+
+        d3.select("#controls").append("button")
+            .on("click", () => filterNetwork(simulation)).html("Filter network")
 
         const drag = d3.drag()
             .on("drag", (e, d) => dragging(e, d, simulation))
@@ -184,6 +187,38 @@ function forceDirectedNetworkDiagram(){
             .selectAll("g.node")
             .call(drag)
     })
+}
+
+function filterNetwork(simulation){
+    const originalNodes = simulation.nodes()
+    const originalEdges = simulation.force("link").links()
+
+    const newNodes = originalNodes.filter(n => n.role === 'employee')
+    const newEdges = originalEdges.filter(e =>  e.source.role === 'employee' && e.target.role === 'employee')
+
+    d3.select("svg")
+        .selectAll("line.link")
+        .data(newEdges, d => `${d.source.id}-${d.target.id}`)
+        .exit()
+        .transition()
+        .duration(4000)
+        .style("opacity", 0)
+        .remove()
+
+    d3.select("svg")
+        .selectAll("g.node")
+        .data(newNodes, d => d.id)
+        .exit()
+        .transition()
+        .duration(3000)
+        .style("opacity", 0)
+        .remove()
+
+    simulation.stop()
+    simulation.nodes(newNodes)
+    simulation.force("link").links(newEdges)
+    simulation.alpha(0.1)
+    simulation.restart()
 }
 
 function dragging(e, d, simulation){
@@ -197,7 +232,7 @@ function dragging(e, d, simulation){
 
 function sizeByDegree(simulation) {
     simulation.stop()
-    simulation.force("charge", d3.forceManyBody().strength(d => -d.degreeCentrality * 30))
+    simulation.force("charge", d3.forceManyBody().strength(d => -d.degreeCentrality * 20))
     simulation.restart()
     d3.selectAll("circle")
     .attr("r", d => d.degreeCentrality * 2)
