@@ -119,7 +119,7 @@ function forceDirectedNetworkDiagram(){
             .append("g")
             .attr("class", "links")
             .selectAll("line.link")
-            .data(edges)
+            .data(edges, d => `${d.source.id}-${d.target.id}`)
             .enter()
             .append("line")
             .attr("class", "link")
@@ -139,7 +139,7 @@ function forceDirectedNetworkDiagram(){
             .append("g")
             .attr("class", "nodes")
             .selectAll("g.node")
-            .data(nodes)
+            .data(nodes, d => d.id)
             .enter()
             .append("g")
             .attr("class", "node")
@@ -153,6 +153,21 @@ function forceDirectedNetworkDiagram(){
             .text(d => d.id)
             .attr("text-anchor", "middle")
             .attr("y", 15)
+
+        const marker = d3.select("svg").append('defs')
+            .append('marker')
+            .attr("id", "triangle")
+            .attr("refX", 12)
+            .attr("refY", 6)
+            .attr("markerUnits", 'userSpaceOnUse')
+            .attr("markerWidth", 12)
+            .attr("markerHeight", 18)
+            .attr("orient", 'auto')
+            .append('path')
+            .attr("d", 'M 0 0 12 6 0 12 3 6');
+            d3.selectAll("line").attr("marker-end", "url(#triangle)");
+
+        d3.selectAll("line").attr("marker-end", "url(#triangle)");
     })
 }
 
