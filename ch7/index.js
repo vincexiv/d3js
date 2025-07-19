@@ -135,7 +135,6 @@ function updateNetwork(d, i){
         .selectAll("circle.node")
         .attr("cy", d => d.x)
         .attr("cx", d => d.y)
-        .style("opacity", d => (d.value - Math.abs(d.value - d.y))/d.value)
 }
 
 function arc(d, i){
