@@ -95,6 +95,80 @@ function forceDirectedLayout(){
         .on("tick", updateNetwork)
 }
 
+function forceDirectedNetworkDiagram(){
+    const roleScale = d3.scaleOrdinal()
+        .domain(["contractor", "employee", "manager"])
+        .range(["#75739F", "#41A368", "#FE9922"])
+
+    Promise.all([nodeList, edgeList]).then(resolve => {
+        const nodes = resolve[0]
+        const edges = resolve[1]
+
+        const nodeHash = nodes.reduce((hash, node) => {
+            hash[node.id] = node
+            return hash
+        }, {})
+
+        edges.forEach(edge => {
+                edge.weight = parseInt(edge.weight)
+                edge.source = nodeHash[edge.source]
+                edge.target = nodeHash[edge.target]
+            })
+
+        d3.select("svg")
+            .append("g")
+            .attr("class", "links")
+            .selectAll("line.link")
+            .data(edges)
+            .enter()
+            .append("line")
+            .attr("class", "link")
+            .style("stroke-width", d => d.weight)
+            .style("opacity", "0.5")
+
+        const simulation = d3.forceSimulation()
+            .force("charge", d3.forceManyBody().strength(-30))
+            .force("center", d3.forceCenter().x(250).y(250))
+            .force("link", d3.forceLink())
+            .nodes(nodes)
+            .on("tick", forceTick)
+
+        simulation.force("link").links(edges)
+
+        const nodeEnter = d3.select("svg")
+            .append("g")
+            .attr("class", "nodes")
+            .selectAll("g.node")
+            .data(nodes)
+            .enter()
+            .append("g")
+            .attr("class", "node")
+
+        nodeEnter.append("circle")
+            .attr("r", 5)
+            .style("fill", d => roleScale(d.role))
+            .style("stroke", "none")
+
+        nodeEnter.append("text")
+            .text(d => d.id)
+            .attr("text-anchor", "middle")
+            .attr("y", 15)
+    })
+}
+
+function forceTick(){
+    d3.selectAll("line.link")
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y)
+        .style("stroke", "black")
+        .each(d => console.log(d))
+
+    d3.selectAll("g.node")
+        .attr("transform", d => `translate(${d.x},${d.y})`)
+}
+
 function createArcDiagram(connections, nodes){
     d3.select("svg")
         .append("g")
@@ -192,4 +266,4 @@ function createAdjacencyMatrix(matrix, nodes){
         .attr("y", (d,i) => i * 25 + 12.5)
 }
 
-forceDirectedLayout()
+forceDirectedNetworkDiagram()

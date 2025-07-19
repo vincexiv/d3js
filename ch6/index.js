@@ -1,6 +1,6 @@
 // d3.csv("parents.csv").then(data => handleParents(data))
-// d3.json("tweets.json").then(data => packedCircles(data))
-d3.json("tweets.json").then(data => dendogram(data))
+d3.json("tweets.json").then(data => packedCircles(data))
+// d3.json("tweets.json").then(data => dendogram(data))
 
 function handleParents(data){
     const stratify = d3.stratify()
