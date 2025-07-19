@@ -180,6 +180,9 @@ function forceDirectedNetworkDiagram(){
         d3.select("#controls").append("button")
             .on("click", () => filterNetwork(simulation)).html("Filter network")
 
+        d3.select("#controls").append("button")
+            .on("click", () => manuallyPositionNodes(simulation)).html("Manually position nodes")
+
         const drag = d3.drag()
             .on("drag", (e, d) => dragging(e, d, simulation))
 
@@ -218,6 +221,57 @@ function filterNetwork(simulation){
     simulation.nodes(newNodes)
     simulation.force("link").links(newEdges)
     simulation.alpha(0.1)
+    simulation.restart()
+}
+
+function manuallyPositionNodes(simulation){
+    const originalEdges = simulation.force("link").links()
+    const originalNodes = simulation.nodes()
+
+    const xExtent = d3.extent(originalNodes, d => parseInt(d.salary))
+    const yExtent = d3.extent(originalNodes, d => parseInt(d.degreeCentrality))
+
+    const xScale = d3.scaleLinear().domain(xExtent).range([50, 450])
+    const yScale = d3.scaleLinear().domain(yExtent).range([450, 50])
+
+    simulation.stop()
+
+    d3.select("svg")
+        .selectAll("line.link")
+        .style("opacity", 0)
+        .attr("x1", d => xScale(parseInt(d.source.salary)))
+        .attr("y1", d => yScale(parseInt(d.source.degreeCentrality)))
+        .attr("x2", d => xScale(parseInt(d.target.salary)))
+        .attr("y2", d => yScale(parseInt(d.target.degreeCentrality)))
+
+    d3.select("svg")
+        .selectAll("g.node")
+        .attr("x", d => xScale(parseInt(d.salary)))
+        .attr("y", d => yScale(parseInt(d.degreeCentrality)))
+
+    d3.selectAll("g.node")
+        .each(d => {
+            d.x = xScale(d.salary)
+            d.y = yScale(d.degreeCentrality)
+            d.vy = 0
+            d.vx = 0
+        })
+
+    const xAxis = d3.axisBottom().scale(xScale)
+    const yAxis = d3.axisRight().scale(yScale)
+
+    d3.select("svg")
+        .append("g")
+        .attr("id", "xAxisG")
+        .attr("transform", "translate(0, 450)")
+        .call(xAxis)
+
+    d3.select("svg")
+        .append("g")
+        .attr("id", "yAxisG")
+        .attr("transform", "translate(450, 0)")
+        .call(yAxis)
+
     simulation.restart()
 }
 
