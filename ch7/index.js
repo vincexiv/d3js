@@ -71,12 +71,7 @@ function arcDiagram(){
 
 function forceDirectedLayout(){
     const roleScale = d3.scaleOrdinal().range(["#75739F", "#41A368", "#FE9922"])
-    const sampleData = d3.range(300).map(() =>({r: 2, value: 200 + d3.randomNormal()() * 50}))
-    console.log(sampleData)
-
-    const manyBody = d3.forceManyBody().strength(1)
-    const center = d3.forceCenter().x(250).y(250)
-    const force = d3.forceSimulation()
+    const sampleData = d3.range(300).map(() =>({r: 2, value: 250 + d3.randomNormal()() * 50}))
 
     d3.select("svg")
         .append("g")
@@ -90,12 +85,12 @@ function forceDirectedLayout(){
         .style("fill", (d, i) => roleScale(i))
         .style("stroke", "none")
 
-    force
-        .force("charge", manyBody)
-        .force("center", center)
+    d3.forceSimulation()
+        .force("charge", d3.forceManyBody().strength(1))
+        .force("center", d3.forceCenter().x(250).y(250))
         .force("collision", d3.forceCollide(d => d.r))
         .force("x", d3.forceX(100))
-        .force("y", d3.forceY(d => d.value).strength(3))
+        .force("y", d3.forceY(d => d.value).strength(1))
         .nodes(sampleData)
         .on("tick", updateNetwork)
 }
@@ -138,8 +133,9 @@ function createArcDiagram(connections, nodes){
 function updateNetwork(d, i){
     d3.select("svg")
         .selectAll("circle.node")
-        .attr("cx", d => d.x)
-        .attr("cy", d => d.y)
+        .attr("cy", d => d.x)
+        .attr("cx", d => d.y)
+        .style("opacity", d => (d.value - Math.abs(d.value - d.y))/d.value)
 }
 
 function arc(d, i){
