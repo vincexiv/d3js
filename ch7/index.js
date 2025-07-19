@@ -228,49 +228,58 @@ function manuallyPositionNodes(simulation){
     const originalEdges = simulation.force("link").links()
     const originalNodes = simulation.nodes()
 
-    const xExtent = d3.extent(originalNodes, d => parseInt(d.salary))
-    const yExtent = d3.extent(originalNodes, d => parseInt(d.degreeCentrality))
+    const yExtent = d3.extent(originalNodes, d => parseInt(d.salary))
+    const xExtent = d3.extent(originalNodes, d => parseInt(d.degreeCentrality))
 
-    const xScale = d3.scaleLinear().domain(xExtent).range([50, 450])
     const yScale = d3.scaleLinear().domain(yExtent).range([450, 50])
+    const xScale = d3.scaleLinear().domain(xExtent).range([50, 400])
 
     simulation.stop()
 
     d3.select("svg")
         .selectAll("line.link")
         .style("opacity", 0)
-        .attr("x1", d => xScale(parseInt(d.source.salary)))
-        .attr("y1", d => yScale(parseInt(d.source.degreeCentrality)))
-        .attr("x2", d => xScale(parseInt(d.target.salary)))
-        .attr("y2", d => yScale(parseInt(d.target.degreeCentrality)))
+        .attr("x1", d => xScale(parseInt(d.source.degreeCentrality)))
+        .attr("y1", d => yScale(parseInt(d.source.salary)))
+        .attr("x2", d => xScale(parseInt(d.target.degreeCentrality)))
+        .attr("y2", d => yScale(parseInt(d.target.salary)))
 
     d3.select("svg")
         .selectAll("g.node")
-        .attr("x", d => xScale(parseInt(d.salary)))
-        .attr("y", d => yScale(parseInt(d.degreeCentrality)))
+        .attr("x", d => xScale(parseInt(d.degreeCentrality)))
+        .attr("y", d => yScale(parseInt(d.salary)))
 
     d3.selectAll("g.node")
         .each(d => {
-            d.x = xScale(d.salary)
-            d.y = yScale(d.degreeCentrality)
+            d.x = xScale(d.degreeCentrality)
+            d.y = yScale(d.salary)
             d.vy = 0
             d.vx = 0
         })
 
-    const xAxis = d3.axisBottom().scale(xScale)
+    const xAxis = d3.axisBottom().scale(xScale).ticks(7)
     const yAxis = d3.axisRight().scale(yScale)
 
-    d3.select("svg")
-        .append("g")
-        .attr("id", "xAxisG")
-        .attr("transform", "translate(0, 450)")
-        .call(xAxis)
+    const xAxisG = d3.select("g#xAxisG")
+    if(xAxisG.empty()){
+        d3.select("svg")
+            .append("g")
+            .attr("id", "xAxisG")
+            .attr("transform", "translate(0, 450)")
+            .call(xAxis)
+    }
 
-    d3.select("svg")
-        .append("g")
-        .attr("id", "yAxisG")
-        .attr("transform", "translate(450, 0)")
-        .call(yAxis)
+    const yAxisG = d3.select("g#yAxisG")
+    if(yAxisG.empty()){
+        const axis = d3.select("svg")
+            .append("g")
+            .attr("id", "yAxisG")
+            .attr("transform", "translate(400, 0)")
+
+        axis.call(yAxis)
+        axis.selectAll("text")
+            .attr("transform", "translate(20, 0)")
+    }
 
     simulation.restart()
 }
