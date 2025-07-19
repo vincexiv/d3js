@@ -71,7 +71,8 @@ function arcDiagram(){
 
 function forceDirectedLayout(){
     const roleScale = d3.scaleOrdinal().range(["#75739F", "#41A368", "#FE9922"])
-    const sampleData = d3.range(100).map((d,i) => ({r: 20 - i * .5}))
+    const sampleData = d3.range(300).map(() =>({r: 2, value: 200 + d3.randomNormal()() * 50}))
+    console.log(sampleData)
 
     const manyBody = d3.forceManyBody().strength(1)
     const center = d3.forceCenter().x(250).y(250)
@@ -93,6 +94,8 @@ function forceDirectedLayout(){
         .force("charge", manyBody)
         .force("center", center)
         .force("collision", d3.forceCollide(d => d.r))
+        .force("x", d3.forceX(100))
+        .force("y", d3.forceY(d => d.value).strength(3))
         .nodes(sampleData)
         .on("tick", updateNetwork)
 }
