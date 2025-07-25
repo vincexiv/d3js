@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="controls"></div>
+    <script src="/d3.v7.min.js"></script>
+    <script src="/ch7/index.js"></script>
+    <style>
+        svg {
+            background-color: whitesmoke;
+            width: 50vw;
+            height: 50vw;
+        }
+        path.countries {
+            stroke-width: 1;
+            stroke: #75739F;
+            fill: #5EAFC6;
+        }
+        circle.cities {
+            stroke-width: 1;
+            stroke: #4F442B;
+            fill: #FCBC34;
+        }
+        circle.centroid {
+            fill: #75739F;
+            pointer-events: none;
+        }
+        rect.bbox {
+            fill: none;
+            stroke-dasharray: 5 5;
+            stroke: #75739F;
+            stroke-width: 2;
+            pointer-events: none;
+        }
+        path.graticule {
+            fill: none;
+            stroke-width: 1;
+            stroke: #9A8B7A;
+        }
+        path.graticule.outline {
+            stroke: #9A8B7A;
+        }
+        path.merged {
+            fill: #9A8B7A;
+            stroke: #4F442B;
+            stroke-width: 2px;
+        }
+    </style>
+</body>
+</html>
